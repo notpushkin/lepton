@@ -1,0 +1,13 @@
+{
+  "name": "example-app",
+  "productName": "Example App",
+  "version": "1.10.0",
+  "description": "A hackable something something for the 21st Century.",
+  "main": "main.js",
+  "engines": {
+    "electron": "1.2.5"
+  },
+  "lepton": {
+    "run": "$ELECTRON ."
+  }
+}
