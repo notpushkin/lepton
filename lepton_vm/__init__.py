@@ -30,6 +30,8 @@ class Particle:
     is managed by Lepton.
     """
 
+    REPO = "https://iamale.github.io/lepton-particles/"
+
     def __init__(self, meta, path=None):
         self.meta = meta
         self.path = path
@@ -50,8 +52,9 @@ class Particle:
             print("already installed")
             return p
 
-        r = requests.get("http://localhost:5555/particles/%s-%s-%s-%s.tar.lzma"
-                         % (name, version, "linux", "x64"), stream=True)
+        r = requests.get("%s/%s-%s-%s-%s.tar.lzma"
+                         % (cls.REPO, name, version, "linux", "x64"),
+                         stream=True)
         r.raise_for_status()
         with tarfile.open(fileobj=BytesIO(r.raw.read())) as tar:
             try:
