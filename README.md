@@ -48,7 +48,7 @@ generic packages). It must specify a path to the binary in the `main` field
   "name": "electron",
   "productName": "Electron",
   "version": "1.2.5",
-  "main": "./bin/",
+  "main": "./electron",
   "os": ["linux"],
   "cpu": ["x64"]
 }
