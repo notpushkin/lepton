@@ -1,8 +1,14 @@
 # Lepton Version Manager
 
+Requires Python 3.4+. [pipsi][] is recommended:
+
+```bash
+pipsi install --python python3 git+https://github.com/iamale/lepton.git#egg=lepton-vm
+# or:
+pip3 install git+https://github.com/iamale/lepton.git#egg=lepton-vm
 ```
-pipsi install git+https://github.com/iamale/lepton.git#egg=lepton-vm
-```
+
+[pipsi]: https://github.com/mitsuhiko/pipsi
 
 ## Applications
 
