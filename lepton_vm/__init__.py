@@ -1,10 +1,12 @@
 import os
+import sys
 import re
 import json
 import tarfile
 import click
 import requests
 import shlex
+import semver
 
 from io import BytesIO
 from pathlib2 import Path
@@ -38,20 +40,22 @@ class Particle:
         self.main = path / meta["main"]
 
     @classmethod
-    def get_local(cls, name, version):
+    def get_local(cls, name, range_):
+        versions = {}
+
         for path in PARTICLES_PATH:
-            p_path = path / name / version
+            p_path = path / name
             if p_path.exists():
-                meta = json.load((p_path / "particle.json").open())
-                return cls(meta, p_path)
+                for v_path in p_path.iterdir():
+                    versions[v_path.name] = v_path
+
+        max_version = semver.max_satisfying(versions.keys(), range_, False)
+        if max_version:
+            meta = json.load((versions[max_version] / "particle.json").open())
+            return cls(meta, versions[max_version])
 
     @classmethod
     def fetch(cls, name, version):
-        p = cls.get_local(name, version)
-        if p:
-            print("already installed")
-            return p
-
         r = requests.get("%s/%s-%s-%s-%s.tar.lzma"
                          % (cls.REPO, name, version, "linux", "x64"),
                          stream=True)
@@ -72,11 +76,13 @@ class Particle:
 
 
 @cli.command("install")
-def cmd_install():
+@click.argument("name")
+@click.argument("version")
+def cmd_install(name, version):
     """
     Installs a package.
     """
-    Particle.fetch("electron", "1.2.5")
+    Particle.fetch(name, version)
 
 
 @cli.command("run")
@@ -95,13 +101,26 @@ def cmd_run(path):
     if "engines" not in package or package["engines"] == {}:
         raise Exception("Invalid package: no engines specified")
 
+    r = requests.get("%s/index.json" % Particle.REPO)
+    r.raise_for_status()
+    remote_particles = r.json()["particles"]
+
     variables = {}
-    for name, version in package["engines"].items():
-        p = Particle.get_local(name, version)
+    for name, range_ in package["engines"].items():
+        p = Particle.get_local(name, range_)
         if not p:
             # if auto_fetch:
-            print("Downloading %s..." % name)
-            p = Particle.fetch(name, version)
+            if name in remote_particles:
+                v = semver.max_satisfying(remote_particles[name], range_, False)
+                if v:
+                    print("Downloading %s %s..." % (name, v))
+                    p = Particle.fetch(name, v)
+                else:
+                    print("Cannot satisfy %s (%s), aborting." % (name, range_))
+                    sys.exit(1)
+            else:
+                print("No particle named %s exists, aborting." % name)
+                sys.exit(1)
         variables["$" + name.upper().replace("-", "_")] = str(p.main)
 
     pattern = re.compile('|'.join(map(re.escape, variables.keys())))

@@ -5,7 +5,7 @@
   "description": "A hackable something something for the 21st Century.",
   "main": "main.js",
   "engines": {
-    "electron": "1.2.5"
+    "electron": "1.2.x"
   },
   "lepton": {
     "run": "$ELECTRON ."

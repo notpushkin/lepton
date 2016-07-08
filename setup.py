@@ -25,7 +25,8 @@ setup(
     install_requires=[
         "Click==6.4",
         "requests==2.10.0",
-        "pathlib2",
+        "pathlib2==2.1.0",
+        "node-semver==0.1.1",
     ],
     entry_points="""
         [console_scripts]
