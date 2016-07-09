@@ -1,3 +1,7 @@
+**NOTE**: this is not intended to be a ready-to-use product. Please think of this as a reference implementation. I just put it up here to test various ideas floating around [this thread][electron-673], nothing more.
+
+[electron-673]: https://github.com/electron/electron/issues/673
+
 # Lepton Version Manager
 
 Requires Python 3.4+. [pipsi][] is recommended:
